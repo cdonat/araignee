@@ -1,8 +1,8 @@
 # araignee
 
-Araignee is an attempt to create a HTTP request router on top of Vinnie Falcos [beast library](https://github.com/vinniefalco/Beast). It is heavily inspired by the routing mechanism in [django](https://www.djangoproject.com/)
+Araignee is an attempt to create a HTTP request router on top of Vinnie Falcos [beast library](https://github.com/vinniefalco/Beast). It is heavily inspired by the routing mechanism in [django](https://www.djangoproject.com/).
 
-Note, that this is pre alpha code. It is more a suggestion to where this might lead, than usable code. use at own risk, or better, don't use at all at the moment.
+Note, that this is pre alpha code. It is more a suggestion to where this might lead, than usable code. Use at own risk, or better, don't use at all at the moment.
 
 ## How to use
 
