@@ -9,8 +9,8 @@
 #include <beast/http.hpp>
 
 namespace araingee {
-    template<typename Body, typename Headers, typename AsyncWriteStream>
-    class http_response: public beast::http::request<Body, Headers> {
+    template<typename Body, typename Headers /*= beast::http::basic_headers<std::allocator<char>>*/, typename AsyncWriteStream>
+    class http_response: public beast::http::response<Body, Headers> {
         AsyncWriteStream stream_;
       public:
         template<typename... Args>
