@@ -11,7 +11,7 @@ namespace araingee
 {
     class url_match_cast_base {
         protected:
-            std::string format_;
+            const std::string format_;
         public:
             url_match_cast_base(const std::string& format) : format_{format} {};
             url_match_cast_base(std::string&& format) : format_{std::move(format)} {};
@@ -23,14 +23,14 @@ namespace araingee
     template<typename T>
     struct url_match_cast : public url_match_cast_base {
         template <typename P>
-        url_match_cast(P&& p): url_match_cast_base{std::forward<P>(p)} {};
+        constexpr url_match_cast(P&& p): url_match_cast_base{std::forward<P>(p)} {};
         T operator () (const std::smatch& m) { return boost::lexical_cast<T>(m.format(format_)); };
     };
 
     template <>
     struct url_match_cast<std::string> : public url_match_cast_base {
         template <typename P>
-        url_match_cast(P&& p): url_match_cast_base{std::forward<P>(p)} {};
+        constexpr url_match_cast(P&& p): url_match_cast_base{std::forward<P>(p)} {};
         std::string operator () (const std::smatch& m) { return m.format(format_); };
     };
 }
