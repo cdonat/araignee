@@ -23,34 +23,39 @@ namespace araingee {
         std::string format_;
 
         template<typename AsyncWriteStream>
-        std::future<boost::system::error_code> internal_error(AsyncWriteStream& stream, const std::string& message = "") {
+        std::future<boost::system::error_code> internal_error(http_response<beast::http::string_body,
+                                                              beast::http::headers, AsyncWriteStream> resp,
+                                                              const std::string& message = "") {
             using namespace std::literals::string_literals;
 
-            auto rval = http_response<beast::http::string_body, beast::http::headers, AsyncWriteStream>{stream};
-            rval.status = 500;
-            rval.reason = beast::http::reason_string(500);
-            rval.body = "500: Internal Server Error: "s + message;
+            resp.status = 500;
+            resp.reason = beast::http::reason_string(500);
+            resp.body = "500: Internal Server Error"s + ((message.size() == 0) ? ""s : ": "s + message);
 
-            rval.headers.replace("Content-Length", rval.body.size());
-            rval.headers.replace("Content-Type", "text/ascii");
+            resp.headers.replace("Content-Length", resp.body.size());
+            resp.headers.replace("Content-Type", "text/ascii");
 
-            return rval;
+            return resp;
         };
 
         public:
-            static_file_handler(const boost::filesystem::path& basePath, const std::string format):
+            static_file_handler(const boost::filesystem::path& basePath, const std::string& format):
                 basePath_{boost::filesystem::absolute(basePath)},
                 format_{format} {};
 
             template<typename Request, typename AsyncWriteStream>
-            std::future<boost::system::error_code> operator() (const std::smatch& match, const Request& req, AsyncWriteStream& stream) {
+            std::future<boost::system::error_code> operator() (const std::smatch& match,
+                                                               const Request& req,
+                                                               AsyncWriteStream& stream) {
                 try {
-                    auto path = boost::filesystem::canonical(boost::filesystem::path{araingee::url_match_cast<std::string>{format_}(match)}, basePath_);
+                    auto path = boost::filesystem::canonical(boost::filesystem::path{araingee::url_match_cast<std::string>{format_}(match)},
+                                                             basePath_);
                     if( boost::filesystem::exists(path) ) {
                         // TODO: check if path is below basePath_.
                         
                         auto filestream = std::ifstream{path.native()};
-                        auto resp = http_response<beast::http::streambuf_body, beast::http::headers, AsyncWriteStream>{stream, filestream.rdbuf()};
+                        auto resp = http_response<beast::http::streambuf_body, beast::http::headers, AsyncWriteStream>{stream,
+                                                                                                                       filestream.rdbuf()};
                         resp.status = 200;
                         resp.reason = beast::http::reason_string(200);
 

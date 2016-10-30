@@ -12,8 +12,13 @@ namespace araingee {
     class http_templated_response: public http_response<Body, Headers, AsyncWriteStream> {
         TemplateProcessor processor_;
       public:
+        http_templated_response(const TemplateProcessor& processor,
+                                const http_response<Body, Headers, AsyncWriteStream>& resp):
+            http_response<Body, Headers, AsyncWriteStream>{resp},
+            processor_{processor} {};
+
         template<typename... Args>
-        http_templated_response(TemplateProcessor processor, AsyncWriteStream&& stream, Args... args):
+        http_templated_response(const TemplateProcessor& processor, AsyncWriteStream&& stream, Args... args):
             http_response<Body, Headers, AsyncWriteStream>{stream, args...},
             processor_{processor} {};
 

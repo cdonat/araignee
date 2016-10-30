@@ -20,15 +20,15 @@ namespace araingee {
             private:
                 url_match_cast<std::string> format_;
             public:
-                redirect_t(const std::string& format): format_{format} {};
-                redirect_t(std::string&& format): format_{std::move(format)} {};
+                constexpr redirect_t(const std::string& format): format_{format} {};
+                constexpr redirect_t(std::string&& format): format_{std::move(format)} {};
 
                 template<typename AsyncWriteStream>
-                auto operator () (const std::smatch& match, const AsyncWriteStream& s)
+                auto operator () (const std::smatch& match,
+                                  http_response<beast::http::string_body, beast::http::headers, AsyncWriteStream> resp)
                 -> http_response<beast::http::string_body, beast::http::headers, AsyncWriteStream> {
                     using namespace std::literals::string_literals;
 
-                    auto resp = http_response<beast::http::string_body, beast::http::headers, AsyncWriteStream>{s};
                     resp.status =(meth == method::keep) ?
                                      (persist == persistance::temporary ? 307 : 308) :
                                      303;
@@ -45,8 +45,9 @@ namespace araingee {
         };
     };
 
-    template <redirection::method meth = redirection::method::keep, redirection::persistance persist = redirection::persistance::temporary>
-    redirection::redirect_t<meth, persist> redirect(const std::string& pattern_str) {
+    template <redirection::method meth = redirection::method::keep,
+              redirection::persistance persist = redirection::persistance::temporary>
+    constexpr redirection::redirect_t<meth, persist> redirect(const std::string& pattern_str) {
         return {pattern_str};
     }
 
